@@ -142,5 +142,23 @@ describe('Cache', () => {
                 assert(JSON.parse(client_memory.test).a);
             });
         });
+
+        describe('#remove', () => {
+            it('removes from client\'s storage system', () => {
+                cache.set('a', stored_collection.a);
+                cache.remove('a');
+
+                assert(client_memory.test);
+                assert(!JSON.parse(client_memory.test).a);
+            });
+        });
+
+        describe('#set', () => {
+            it('backups up to the client\'s storage system', () => {
+                cache.set('a', stored_collection.a);
+                assert(client_memory.test);
+                assert(JSON.parse(client_memory.test).a);
+            });
+        });
     });
 });
