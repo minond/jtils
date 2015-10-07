@@ -1,0 +1,20 @@
+{
+  "name": "jtils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minond/jtils.git"
+  },
+  "author": "Marcos Minond",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/minond/jtils/issues"
+  },
+  "homepage": "https://github.com/minond/jtils",
+  "devDependencies": {
+    "tsd": "^0.6.5",
+    "typescript": "^1.6.2"
+  }
+}
