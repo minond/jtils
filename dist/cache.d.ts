@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import * as Q from 'q';
 export interface LoaderFunction<T> {
     (id: string): Q.Promise<T>;

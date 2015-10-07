@@ -18,6 +18,8 @@ bin_tsc = ./node_modules/.bin/tsc
 build:
 	$(bin_tsc) $(dir_source)/** --outDir $(dir_dist) --module commonjs -d --removeComments
 	$(bin_tsc) $(dir_test)/** --outDir $(dir_tmp) --module commonjs
+	tail -n +2 dist/cache.d.ts > dist/.cache.d.ts
+	mv dist/.cache.d.ts dist/cache.d.ts
 
 install:
 	$(bin_npm) install
