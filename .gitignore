@@ -1,3 +1,4 @@
 /node_modules/
 /typings/
 /build/
+/.tmp-build-dir/

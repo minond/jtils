@@ -1,5 +1,7 @@
 /// <reference path="../typings/tsd.d.ts"/>
 
+'use strict';
+
 import * as Q from 'q';
 
 interface LoaderFunction<T> {
@@ -23,7 +25,7 @@ interface AsyncStorageEngine {
 export class Cache<T> {
     loader: LoaderFunction<T>;
     memory: CacheDict<T> = {};
-    timers: { [id: string]: number } = {};
+    timers: { [id: string]: number | NodeJS.Timer } = {};
     ttl: number = 1000 * 60 * 15;
 
     constructor(loader: LoaderFunction<T>) {
@@ -43,7 +45,7 @@ export class Cache<T> {
     }
 
     queueRemoval(id: string, ttl: number = this.ttl): void {
-        clearTimeout(this.timers[id]);
+        clearTimeout(<NodeJS.Timer>this.timers[id]);
         this.timers[id] = setTimeout(() => this.remove(id), ttl);
     }
 
