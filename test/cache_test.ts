@@ -5,27 +5,87 @@
 import * as assert from 'assert';
 import {Cache, AsyncStorageCache} from '../src/cache';
 
+interface DummyUser {
+    id: string;
+    name: string;
+}
+
 describe('Cache', () => {
     let cache, collection;
 
     beforeEach(() => {
         collection = {
-            '1': {
-                id: '1',
+            'a': {
+                id: 'a',
                 name: 'Marcos'
             },
-            '2': {
-                id: '2',
+            'b': {
+                id: 'b',
                 name: 'Marcos'
             },
-            '3': {
-                id: '3',
+            'c': {
+                id: 'c',
                 name: 'Marcos'
             }
         };
 
-        cache = new Cache((id) => collection[id]);
+        cache = new Cache<DummyUser>((id) => collection[id]);
+        cache.now = () => 1;
     });
 
+    afterEach(() => cache.flush());
+
     it('#constructor', () => assert(cache.loader));
+
+    describe('#has', () => {
+        it('checks memory', () => {
+            cache.set('a', collection.a);
+            assert(cache.has('a'));
+        });
+
+        it('checks the entry\'s ttl', () => {
+            cache.set('a', collection.a);
+            cache.memory.a.ttl = 0;
+            assert(!cache.has('a'));
+        });
+    });
+
+    describe('#set', () => {
+        it('queues removal of the entry', () => {
+            cache.set('a', collection.a);
+            assert(cache.timers.a);
+        });
+
+        it('will remove the entry at the appropriate time', () => {
+            cache.set('a', collection.a);
+            assert(cache.memory.a.ttl === 1 + cache.ttl);
+        });
+    });
+
+    describe('#remove', () => {
+        it('clears memory and timers', () => {
+            cache.set('a', collection.a);
+            cache.set('b', collection.b);
+
+            cache.remove('a');
+            assert(!cache.memory.a);
+            assert(!cache.timers.a);
+
+            assert(cache.memory.b);
+            assert(cache.timers.b);
+        });
+    });
+
+    describe('#flush', () => {
+        it('clears memory and timers', () => {
+            cache.set('a', collection.a);
+            cache.set('b', collection.b);
+
+            cache.flush();
+            assert(!cache.memory.a);
+            assert(!cache.timers.a);
+            assert(!cache.memory.b);
+            assert(!cache.timers.b);
+        });
+    });
 });

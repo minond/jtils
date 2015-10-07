@@ -27,6 +27,7 @@ export class Cache<T> {
     memory: CacheDict<T> = {};
     timers: { [id: string]: number | NodeJS.Timer } = {};
     ttl: number = 1000 * 60 * 15;
+    now: () => number = Date.now;
 
     constructor(loader: LoaderFunction<T>) {
         this.loader = loader;
@@ -37,11 +38,22 @@ export class Cache<T> {
             }
 
             if (this.has(id)) {
-                this.queueRemoval(id, this.memory[id].ttl - Date.now());
+                this.queueRemoval(id, this.memory[id].ttl - this.now());
             } else {
                 this.remove(id);
             }
         }
+    }
+
+    flush(): void {
+        for (var id in this.memory) {
+            if (this.memory.hasOwnProperty(id)) {
+                this.remove(id);
+            }
+        }
+
+        this.memory = {};
+        this.timers = {};
     }
 
     queueRemoval(id: string, ttl: number = this.ttl): void {
@@ -50,15 +62,17 @@ export class Cache<T> {
     }
 
     has(id: string): Boolean {
-        return id in this.memory && this.memory[id].ttl > Date.now();
+        return id in this.memory && this.memory[id].ttl > this.now();
     }
 
     remove(id: string): void {
+        clearTimeout(<NodeJS.Timer>this.timers[id]);
+        delete this.timers[id];
         delete this.memory[id];
     }
 
     set(id: string, val: T): T {
-        var ttl = this.ttl + Date.now();
+        var ttl = this.ttl + this.now();
         this.memory[id] = { val, ttl };
         this.queueRemoval(id);
         return val;
@@ -74,7 +88,7 @@ export class Cache<T> {
         def.resolve(this.memory[id].val);
 
         // reset removal and reset die time
-        this.memory[id].ttl = this.ttl + Date.now();
+        this.memory[id].ttl = this.ttl + this.now();
         this.queueRemoval(id);
 
         return def.promise;

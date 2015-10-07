@@ -11,19 +11,29 @@ var Cache = (function () {
         this.memory = {};
         this.timers = {};
         this.ttl = 1000 * 60 * 15;
+        this.now = Date.now;
         this.loader = loader;
         for (var id in this.memory) {
             if (!this.memory.hasOwnProperty(id)) {
                 continue;
             }
             if (this.has(id)) {
-                this.queueRemoval(id, this.memory[id].ttl - Date.now());
+                this.queueRemoval(id, this.memory[id].ttl - this.now());
             }
             else {
                 this.remove(id);
             }
         }
     }
+    Cache.prototype.flush = function () {
+        for (var id in this.memory) {
+            if (this.memory.hasOwnProperty(id)) {
+                this.remove(id);
+            }
+        }
+        this.memory = {};
+        this.timers = {};
+    };
     Cache.prototype.queueRemoval = function (id, ttl) {
         var _this = this;
         if (ttl === void 0) { ttl = this.ttl; }
@@ -31,13 +41,15 @@ var Cache = (function () {
         this.timers[id] = setTimeout(function () { return _this.remove(id); }, ttl);
     };
     Cache.prototype.has = function (id) {
-        return id in this.memory && this.memory[id].ttl > Date.now();
+        return id in this.memory && this.memory[id].ttl > this.now();
     };
     Cache.prototype.remove = function (id) {
+        clearTimeout(this.timers[id]);
+        delete this.timers[id];
         delete this.memory[id];
     };
     Cache.prototype.set = function (id, val) {
-        var ttl = this.ttl + Date.now();
+        var ttl = this.ttl + this.now();
         this.memory[id] = { val: val, ttl: ttl };
         this.queueRemoval(id);
         return val;
@@ -51,7 +63,7 @@ var Cache = (function () {
         var def = Q.defer();
         def.resolve(this.memory[id].val);
         // reset removal and reset die time
-        this.memory[id].ttl = this.ttl + Date.now();
+        this.memory[id].ttl = this.ttl + this.now();
         this.queueRemoval(id);
         return def.promise;
     };
