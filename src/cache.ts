@@ -4,20 +4,20 @@
 
 import * as Q from 'q';
 
-interface LoaderFunction<T> {
+export interface LoaderFunction<T> {
     (id: string): Q.Promise<T>;
 }
 
-interface CacheItem<T> {
+export interface CacheItem<T> {
     val: T;
     ttl: number;
 }
 
-interface CacheDict<T> {
+export interface CacheDict<T> {
     [id: string]: CacheItem<T>;
 }
 
-interface AsyncStorageEngine {
+export interface AsyncStorageEngine {
     setItem(id: string, val: any);
     getItem(id: string): any;
 }
