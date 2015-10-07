@@ -2,6 +2,7 @@
 
 'use strict';
 
+import * as Q from 'q';
 import * as assert from 'assert';
 import {Cache, AsyncStorageCache} from '../src/cache';
 
@@ -29,7 +30,7 @@ describe('Cache', () => {
             }
         };
 
-        cache = new Cache<DummyUser>((id) => collection[id]);
+        cache = new Cache<DummyUser>((id) => Q.when(collection[id]));
         cache.now = () => 1;
     });
 
@@ -86,6 +87,24 @@ describe('Cache', () => {
             assert(!cache.timers.a);
             assert(!cache.memory.b);
             assert(!cache.timers.b);
+        });
+    });
+
+    describe('#get', () => {
+        it('returns a cached entry', (done) => {
+            cache.set('a', collection.a);
+            cache.get('a').then((a) => {
+                assert(collection.a === a);
+                done();
+            }).catch((err) => done(err));
+        });
+
+        it('fetches a cached entry', (done) => {
+            assert(!cache.has('a'));
+            cache.get('a').then((a) => {
+                assert(collection.a === a);
+                done();
+            }).catch((err) => done(err));
         });
     });
 });
