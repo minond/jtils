@@ -14,7 +14,7 @@ ifdef DEBUG
 endif
 
 build:
-	$(bin_tsc) src --outDir $(dir_dist) --module commonjs $(ts_options) --rootDir ./
+	$(bin_tsc) src/** --outDir $(dir_dist) --module commonjs $(ts_options) --rootDir ./
 
 install:
 	$(bin_npm) install

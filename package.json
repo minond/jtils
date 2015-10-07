@@ -16,5 +16,8 @@
   "devDependencies": {
     "tsd": "^0.6.5",
     "typescript": "^1.6.2"
+  },
+  "dependencies": {
+    "q": "^1.4.1"
   }
 }
