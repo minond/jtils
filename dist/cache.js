@@ -62,7 +62,6 @@ var Cache = (function () {
     Cache.prototype.deferredGet = function (id) {
         var def = Q.defer();
         def.resolve(this.memory[id].val);
-        // reset removal and reset die time
         this.memory[id].ttl = this.ttl + this.now();
         this.queueRemoval(id);
         return def.promise;

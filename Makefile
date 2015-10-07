@@ -16,8 +16,7 @@ bin_tsd = ./node_modules/.bin/tsd
 bin_tsc = ./node_modules/.bin/tsc
 
 build:
-	$(bin_tsc) $(dir_source)/** --outDir $(dir_dist) --module commonjs
-	$(bin_tsc) $(dir_source)/** --outDir $(dir_dist) --module commonjs -d
+	$(bin_tsc) $(dir_source)/** --outDir $(dir_dist) --module commonjs -d --removeComments
 	$(bin_tsc) $(dir_test)/** --outDir $(dir_tmp) --module commonjs
 
 install:
