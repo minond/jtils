@@ -160,5 +160,15 @@ describe('Cache', () => {
                 assert(JSON.parse(client_memory.test).a);
             });
         });
+
+        describe('#get', () => {
+            it('reads from the client\'s storage system', (done) => {
+                client_memory.test = JSON.stringify(stored_collection);
+                cache.get('a').then((a) => {
+                    assert(stored_collection.a.name === a.name);
+                    done();
+                }).catch((err) => done(err));
+            });
+        });
     });
 });
