@@ -42,3 +42,14 @@ export declare class AsyncStorageCache<T> extends Cache<T> {
 export declare class LocalStorageCache<T> extends AsyncStorageCache<T> {
     constructor(loader: LoaderFunction<T>, key?: string);
 }
+export declare class LocalStorageListCache<T> {
+    private engine;
+    private label;
+    private max;
+    private memory;
+    constructor(label: string, max?: number, engine?: AsyncStorageEngine);
+    protected read(): void;
+    protected write(): void;
+    get(): T[];
+    unshift(val: T): void;
+}

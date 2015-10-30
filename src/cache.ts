@@ -132,3 +132,36 @@ export class LocalStorageCache<T> extends AsyncStorageCache<T> {
         super(loader, localStorage, key);
     }
 }
+
+export class LocalStorageListCache<T> {
+    private engine: AsyncStorageEngine;
+    private label: string;
+    private max: number;
+    private memory: T[];
+
+    constructor(label: string, max: number = Infinity, engine: AsyncStorageEngine = localStorage) {
+        this.label = label;
+        this.max = max;
+        this.engine = engine;
+        this.read();
+    }
+
+    protected read() {
+        this.memory = JSON.parse(this.engine.getItem(this.label) || '[]');
+        this.memory = this.memory.splice(0, this.max);
+    }
+
+    protected write() {
+        this.memory = this.memory.splice(0, this.max);
+        this.engine.setItem(this.label, JSON.stringify(this.memory));
+    }
+
+    get(): T[] {
+        return this.memory;
+    }
+
+    unshift(val: T) {
+        this.memory.unshift(val);
+        this.write();
+    }
+}

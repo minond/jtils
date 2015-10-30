@@ -106,3 +106,30 @@ var LocalStorageCache = (function (_super) {
     return LocalStorageCache;
 })(AsyncStorageCache);
 exports.LocalStorageCache = LocalStorageCache;
+var LocalStorageListCache = (function () {
+    function LocalStorageListCache(label, max, engine) {
+        if (max === void 0) { max = Infinity; }
+        if (engine === void 0) { engine = localStorage; }
+        this.label = label;
+        this.max = max;
+        this.engine = engine;
+        this.read();
+    }
+    LocalStorageListCache.prototype.read = function () {
+        this.memory = JSON.parse(this.engine.getItem(this.label) || '[]');
+        this.memory = this.memory.splice(0, this.max);
+    };
+    LocalStorageListCache.prototype.write = function () {
+        this.memory = this.memory.splice(0, this.max);
+        this.engine.setItem(this.label, JSON.stringify(this.memory));
+    };
+    LocalStorageListCache.prototype.get = function () {
+        return this.memory;
+    };
+    LocalStorageListCache.prototype.unshift = function (val) {
+        this.memory.unshift(val);
+        this.write();
+    };
+    return LocalStorageListCache;
+})();
+exports.LocalStorageListCache = LocalStorageListCache;

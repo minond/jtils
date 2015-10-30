@@ -4,12 +4,50 @@
 
 import * as Q from 'q';
 import * as assert from 'assert';
-import {Cache, AsyncStorageCache} from '../src/cache';
+import {Cache, LocalStorageListCache, AsyncStorageCache} from '../src/cache';
 
 interface DummyUser {
     id: string;
     name: string;
 }
+
+describe('AsyncStorageCache', () => {
+    let cache;
+
+    beforeEach(() => {
+        cache = new LocalStorageListCache<number>('test', 3, {
+            setItem: (name, val) => null,
+            getItem: (name) => '[1, 2, 3, 4, 5, 6, 7]'
+        });
+    });
+
+    describe('#read', () => {
+        it('removes extra items', () => {
+            assert(cache.get().length === 3);
+        });
+    });
+
+    describe('#unshift', () => {
+        it('unshifts new values', () => {
+            cache.unshift(3);
+            cache.unshift(2);
+            cache.unshift(1);
+            assert(cache.get()[0] === 1);
+            assert(cache.get()[1] === 2);
+            assert(cache.get()[2] === 3);
+        });
+
+        it('remove extra items', () => {
+            cache.unshift(1);
+            cache.unshift(1);
+            cache.unshift(1);
+            cache.unshift(1);
+            cache.unshift(1);
+            cache.unshift(1);
+            assert(cache.get().length === 3);
+        });
+    });
+});
 
 describe('Cache', () => {
     let cache, loader, stored_collection;
